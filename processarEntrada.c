@@ -65,7 +65,7 @@ int tipo_palavra(char linha[], int l, int n_linha){
 }
 
 int tipo_diretiva(char linha[], int l, int n_linha){
-	int j = 0;
+	int j = 0, i=0;
 	char *palavra = malloc(sizeof(char)*64);
 	char dec[] = "";
 	char hex[] = "0x[0-9a-fA-F]{10,10}[^0-9a-fA-f]";
@@ -73,7 +73,7 @@ int tipo_diretiva(char linha[], int l, int n_linha){
 	char org_dec[] = "(.org *[0-9]{1,}([^x]|[ \n]))";
 	char set_hex[] = "(.set *[a-zA-z_][a-zA-Z0-9_]* *0x[0-9a-fA-F]{1,})";
 	char set_dec[] = "(.set *[a-zA-z_][a-zA-Z0-9_]* *[0-9]{1,}[^a-z])";
-	char align[] = "(.align *[0-9]{1,})";
+	char align[] = "(.align *[0-9]{1,4}[ \n])";
 	char wfill_hex[] = "(.wfill *[0-9]* *0x[0-9a-fA-F]{1,})";
 	//char wfill_dec = ;
 	char wfill_sym[] = "(.wfill *[0-9]* *[a-zA-z_][a-zA-Z0-9_]*)";
@@ -148,10 +148,44 @@ int tipo_diretiva(char linha[], int l, int n_linha){
 		novoToken.linha = n_linha;
 		adicionarToken(novoToken);
 		return l;
-		
 	}
 	
-	
+	//caso seja a diretiva .align (verificar não ta rolando com \n)
+	if(match(linha, align)){
+		printf("entrei aqui ihaaa\n\n");
+		while(linha[l] != '.'){
+			l++;
+		}	
+		for(j=0; j<6; j++){
+			palavra[j] = linha[l];
+			l++;
+		}
+		palavra[j] = '\0';
+		novoToken.tipo = Diretiva;
+		novoToken.palavra = palavra;
+		novoToken.linha = n_linha;
+		adicionarToken(novoToken);
+		
+		while(linha[l] == ' '){
+			l++;
+		}
+		
+		j = 0;
+		palavra = malloc(sizeof(char)*4);
+		
+		for(i=0; i<4; i++){
+			if(linha[l+1] == ' '){
+				i=4;
+			}
+			palavra[j] = linha [l];
+			j++;
+		}
+		palavra[j] = '\0';
+		novoToken.tipo = Decimal;
+		novoToken.palavra = palavra;
+		novoToken.linha = n_linha;
+		adicionarToken(novoToken);
+	}
 	
 	
 
